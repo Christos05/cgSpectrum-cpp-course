@@ -33,10 +33,8 @@ int main()
 
 	for (int i = 1; i <= number; i++)
 	{
-		//int dividedNumber = number / i;
 		if (number % i == 0)
 		{
-			//cout << i << " is a value Factor of " << number << endl;
 			if (i + 1 > number)
 			{
 				cout << i << " are the Factor Values of " << number << endl;
