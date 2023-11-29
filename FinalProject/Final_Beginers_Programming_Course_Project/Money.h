@@ -8,6 +8,7 @@ public:
 
 	int GetWorth() const { return m_worth; }
 
+	virtual ActorType GetType() { return ActorType::Money; }
 	virtual void Draw() override;
 private:
 	int m_worth;

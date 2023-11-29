@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Player.h"
 #include "Key.h"
+#include "AudioManager.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ bool Player::HasKey()
 {
 	return m_pCurrentKey != nullptr;
 }
-bool Player::HasKey(int color)
+bool Player::HasKey(ActorColor color)
 {
 	return HasKey() && m_pCurrentKey->GetColor() == color;
 }
@@ -36,6 +37,7 @@ void Player::DropKey()
 {
 	if (m_pCurrentKey)
 	{
+		AudioManager::GetInstance()->PlayKeyDropSound();
 		m_pCurrentKey->Place(m_pPosition->x, m_pPosition->y);
 		m_pCurrentKey = nullptr;
 	}
