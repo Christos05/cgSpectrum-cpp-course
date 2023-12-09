@@ -2,8 +2,9 @@
 #include "Player.h"
 #include "Levels.h"
 #include <iostream>
-#include <vector>
+#include <windows.h>
 #include <conio.h>
+#include <vector>
 
 using namespace std;
 
@@ -11,9 +12,12 @@ constexpr int arrowRight = 100;
 constexpr int arrowLeft = 97;
 constexpr int arrowUp = 119;
 constexpr int Space = 32;
+constexpr int LeftArrowKey = 75;
+constexpr int RightArrowKey = 77;
 
 void Draw(vector<vector<char>> level, int levelPivot, int levelWidth, int levelHeight, Player* myPlayer, Levels myLevel);
 vector<vector<char>> GetLevel(int level, Levels myLevel);
+void SetColor(char character);
 
 Game::Game()
 	: finishedLevel(false)
@@ -63,16 +67,25 @@ void Game::Update(int Level)
 		int input = _getch();
 		int newX = 0;
 		int newY = 0;
+		
 		if (input == arrowRight)
 		{
-			myPlayer.lastDirection = 1;
+			if (myPlayer.lastDirection == -1)
+			{
+				myPlayer.lastDirection = 1;
+				myLevel.levelNeedsReDraw = true;
+			}
 			newX = myPlayer.positionX + 1;
 			newY = myPlayer.positionY;
 			MoveRight(Level, newX, newY);
 		}
 		else if (input == arrowLeft)
 		{
-			myPlayer.lastDirection = -1;
+			if (myPlayer.lastDirection == 1)
+			{
+				myPlayer.lastDirection = -1;
+				myLevel.levelNeedsReDraw = true;
+			}
 			newX = myPlayer.positionX - 1;
 			newY = myPlayer.positionY;
 			MoveLeft(Level, newX, newY);
@@ -81,6 +94,22 @@ void Game::Update(int Level)
 		{
 			myPlayer.Jump(3);
 			myLevel.levelNeedsReDraw = true;
+		}
+		else if (input == RightArrowKey)
+		{
+			if (myPlayer.lastDirection == -1)
+			{
+				myPlayer.lastDirection = 1;
+				myLevel.levelNeedsReDraw = true;
+			}
+		}
+		else if (input == LeftArrowKey)
+		{
+			if (myPlayer.lastDirection == 1)
+			{
+				myPlayer.lastDirection = -1;
+				myLevel.levelNeedsReDraw = true;
+			}
 		}
 	}
 }
@@ -91,7 +120,7 @@ bool Game::Collition(int x, int y, vector<vector<char>> level)
 	{
 		return true;
 	}
-	if (level[y][x] == ' ' || level[y][x] == '@' || level[y][x] == '|' || level[y][x] == '_')
+	if (level[y][x] == ' ' || level[y][x] == '>' || level[y][x] == '|' || level[y][x] == '_')
 	{
 		return false;
 	}
@@ -106,13 +135,15 @@ void Draw(vector<vector<char>> level, int levelPivot, int levelWidth, int levelH
 	cout << "Controls:" << endl;
 	cout << "Move: A, D" << endl;
 	cout << "Jump: W, Space" << endl;
+	cout << "Change Direction: Left Arrow, Right Arrow" << endl;
 	for (int y = 0; y < level.size(); y++)
 	{
 		for (int x = levelPivot; x < level[y].size() + levelPivot; x++)
 		{
+			SetColor(' ');
 			if (x + 1 <= levelWidth + levelPivot && y + 1 <= levelHeight)
 			{
-				if (level[y][x] == '@')
+				if (level[y][x] == '>' || level[y][x] == '<')
 				{
 					if (!myPlayer->inLevel)
 					{
@@ -123,7 +154,18 @@ void Draw(vector<vector<char>> level, int levelPivot, int levelWidth, int levelH
 					
 					if (myPlayer->positionX == x && myPlayer->positionY == y)
 					{
-						cout << '@';
+						
+						SetColor('>');
+						SetColor('<');
+						if (myPlayer->lastDirection == 1)
+						{
+							cout << '>';
+						}
+						else
+						{
+							cout << '<';
+						}
+						
 					}
 					else
 					{
@@ -134,10 +176,20 @@ void Draw(vector<vector<char>> level, int levelPivot, int levelWidth, int levelH
 				{
 					if (myPlayer->positionX == x && myPlayer->positionY == y && myPlayer->inLevel)
 					{
-						cout << '@';
+						SetColor('>');
+						SetColor('<');
+						if (myPlayer->lastDirection == 1)
+						{
+							cout << '>';
+						}
+						else
+						{
+							cout << '<';
+						}
 					}
 					else
 					{
+						SetColor(level[y][x]);
 						cout << level[y][x];
 					}
 				}
@@ -219,5 +271,30 @@ void Game::HandleJumping(int Level, int newX, int newY)
 			myLevel.levelNeedsReDraw = true;
 		}
 		myPlayer.jumping = false;
+	}
+}
+void SetColor(char character)
+{
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	if (character == '>')
+	{
+		SetConsoleTextAttribute(console, 9); //Light blue
+	}
+	else if (character == '|')
+	{
+		SetConsoleTextAttribute(console, 8); //Gray
+	}
+	else if (character == '_')
+	{
+		SetConsoleTextAttribute(console, 42); //Light green
+	}
+	else if (character == '=')
+	{
+		SetConsoleTextAttribute(console, 42); //Light green
+	}
+	else
+	{
+		SetConsoleTextAttribute(console, 7); //White
 	}
 }
