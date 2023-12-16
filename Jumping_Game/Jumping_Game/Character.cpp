@@ -12,7 +12,7 @@ Character::~Character()
 
 void Character::Heal(int amount)
 {
-	if (health += amount > maxHealth)
+	if (health + amount > maxHealth)
 	{
 		health = maxHealth;
 	}
@@ -23,7 +23,7 @@ void Character::Heal(int amount)
 }
 void Character::Damage(int amount)
 {
-	if (health -= amount < 0)
+	if (health - amount < 0)
 	{
 		health = 0;
 	}

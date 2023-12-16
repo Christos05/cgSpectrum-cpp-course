@@ -9,6 +9,7 @@ int main()
 
     while (!myGame.IsGameFinished())
     {
+        myGame.LoadLevel(1);
         while (!myGame.IsLevelFinished())
         {
             myGame.DrawFrame(1);
